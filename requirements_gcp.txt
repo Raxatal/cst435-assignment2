@@ -1,8 +1,0 @@
-numpy
-pandas
-opencv-python
-scikit-image
-psutil
-matplotlib
-libgl1
-zip

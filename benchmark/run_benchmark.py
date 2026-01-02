@@ -17,7 +17,7 @@ from pipeline.threadpool_impl import process_images_threadpool
 # ---------------- Configuration ----------------
 DATASET_DIR = "data/input/images"       # Total 3000 images from 3 food classes
 OUTPUT_BASE = "data/output"             # Output for processed images
-LIMIT_IMAGES = 3000                     # Change this to switch between first 1000, 2000, 3000 images, etc
+LIMIT_IMAGES = 2000                     # Change this to switch between first 1000, 2000, 3000 images, etc
 WORKER_COUNTS = [1, 2, 4]
 
 RESULT_CSV = "benchmark/plots/benchmark_results.csv"
