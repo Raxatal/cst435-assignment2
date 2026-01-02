@@ -1,19 +1,18 @@
 import cv2
 import numpy as np
 
-
-def apply_gaussian_blur(image):
+def apply_gaussian_blur(image: np.ndarray, kernel_size: int = 3) -> np.ndarray:
     """
-    Apply a 3x3 Gaussian blur to smooth the image.
-
-    This helps reduce noise before edge detection.
-    OpenCV is used here for efficiency and clarity.
+    Apply a Gaussian blur to smooth the image.
+    
+    Args:
+        image (np.ndarray): Input image.
+        kernel_size (int): Size of the Gaussian kernel (must be odd).
+    
+    Returns:
+        np.ndarray: Blurred image.
     """
-
-    if image is None:
-        raise ValueError("Input image is None")
-
-    # Kernel size (3x3) with standard deviation automatically computed
-    blurred = cv2.GaussianBlur(image, (3, 3), 0)
-
-    return blurred.astype(np.uint8)
+    if kernel_size % 2 == 0:
+        kernel_size += 1  # Kernel must be odd
+    blurred = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+    return blurred

@@ -1,54 +1,52 @@
 import os
 import time
+from multiprocessing import Pool
 
-from utils.image_io import load_image, save_image
+from utils.image_utils import read_image, save_image
 from filters.grayscale import apply_grayscale
 from filters.gaussian_blur import apply_gaussian_blur
-from filters.sobel import apply_sobel
+from filters.edge_detection import apply_sobel_edge
 from filters.sharpen import apply_sharpen
 from filters.brightness import adjust_brightness
 
 
 def process_single_image(args):
     """
-    Worker function for multiprocessing.
-
-    Each process handles one image independently.
+    Worker function.
+    Each process handles exactly one image.
     """
     image_path, output_dir = args
 
-    image = load_image(image_path)
+    image = read_image(image_path)
 
-    image = apply_grayscale(image)
-    image = apply_gaussian_blur(image)
-    image = apply_sobel(image)
-    image = apply_sharpen(image)
-    image = adjust_brightness(image, delta=30)
+    gray = apply_grayscale(image)
+    blurred = apply_gaussian_blur(gray)
+    edges = apply_sobel_edge(blurred)
+    sharpened = apply_sharpen(edges)
+    final_image = adjust_brightness(sharpened, value=20)
 
-    output_path = os.path.join(
-        output_dir,
-        os.path.basename(image_path)
-    )
-    save_image(image, output_path)
+    filename = os.path.basename(image_path)
+    save_path = os.path.join(output_dir, filename)
+    save_image(save_path, final_image)
+
+    return filename
 
 
 def process_images_multiprocessing(image_paths, output_dir, num_workers):
     """
-    Run the image processing pipeline using multiprocessing.
+    Parallel image processing using multiprocessing.Pool.
     """
-
-    from multiprocessing import Pool
+    os.makedirs(output_dir, exist_ok=True)
 
     start_time = time.time()
 
-    # Prepare arguments for each worker
-    tasks = [
-        (image_path, output_dir)
-        for image_path in image_paths
-    ]
+    # Prepare arguments for workers
+    worker_args = [(path, output_dir) for path in image_paths]
 
     with Pool(processes=num_workers) as pool:
-        pool.map(process_single_image, tasks)
+        results = pool.map(process_single_image, worker_args)
 
-    total_time = time.time() - start_time
-    return total_time
+    elapsed = time.time() - start_time
+    print(f"[RESULT] Multiprocessing time ({num_workers} workers): {elapsed:.2f} seconds")
+
+    return elapsed

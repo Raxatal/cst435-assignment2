@@ -1,38 +1,34 @@
 import os
+from typing import List
 
-
-def load_image_paths(
-    base_dir,
-    limit=200,
-    extensions=(".jpg", ".jpeg", ".png")
-):
+def load_image_paths(base_dir: str, limit: int = None) -> List[str]:
     """
-    Load image file paths from a given directory.
-
-    Parameters:
-    - base_dir: directory containing image files
-    - limit: maximum number of images to load
-    - extensions: valid image extensions
+    Load full paths to all images in the specified dataset folder.
+    
+    Args:
+        base_dir (str): Path to the folder containing images
+        limit (int, optional): Max number of images to load. Loads all if None
 
     Returns:
-    - List of absolute image file paths
+        List[str]: List of full image paths
     """
-
     if not os.path.exists(base_dir):
         raise FileNotFoundError(f"Dataset directory not found: {base_dir}")
 
-    image_files = []
+    # Collect all files that are likely images
+    valid_extensions = (".jpg", ".jpeg", ".png")
+    image_paths = [
+        os.path.join(base_dir, f)
+        for f in os.listdir(base_dir)
+        if f.lower().endswith(valid_extensions)
+    ]
 
-    # Sort files to ensure consistent ordering across runs
-    for filename in sorted(os.listdir(base_dir)):
-        if filename.lower().endswith(extensions):
-            image_files.append(os.path.join(base_dir, filename))
+    # Sort so results are deterministic
+    image_paths.sort()
 
-        if len(image_files) >= limit:
-            break
+    # Apply limit if got
+    if limit:
+        image_paths = image_paths[:limit]
 
-    if len(image_files) == 0:
-        raise RuntimeError("No images found in dataset directory.")
-
-    print(f"[INFO] Loaded {len(image_files)} images from {base_dir}")
-    return image_files
+    print(f"[INFO] Loaded {len(image_paths)} images from {base_dir}")
+    return image_paths

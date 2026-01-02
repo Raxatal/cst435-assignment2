@@ -1,6 +1,6 @@
 numpy
 pandas
-pillow
 opencv-python
-matplotlib
+scikit-image
 psutil
+matplotlib
